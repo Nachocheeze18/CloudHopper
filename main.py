@@ -79,3 +79,12 @@ def update_platforms(my_list, y_pos, change):
 
 
 running = True
+while running == True:
+    timer.tick(fps)
+    screen.fill(background)
+    screen.blit(player, (player_x, player_y))
+    blocks = []
+    score_text = font.render('High Score: ' + str(high_score), True, black, background)
+    screen.blit(score_text, (280, 0))
+    high_score_text = font.render('Score: ' + str(score), True, black, background)
+    screen.blit(high_score_text, (320, 20))
