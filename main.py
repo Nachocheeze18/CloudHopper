@@ -1,3 +1,4 @@
+#Imports for code
 import random
 
 import pygame
@@ -24,8 +25,8 @@ game_over = False
 # Game variables
 player_x = 170
 player_y = 400
-platforms = [[175, 480, 70, 10], [85, 370, 70, 10], [265, 370, 70, 10], [175, 260, 70, 10], [85, 150, 70, 10], 
-        [265, 150, 70, 10], [175, 40 70, 10]]
+platforms = [[175, 480, 70, 10], [85, 370, 70, 10], [265, 370, 70, 10], [175, 260, 70, 10], [85, 150, 70, 10],
+             [265, 150, 70, 10], [175, 40 70, 10]]
 jump = False
 y_change = 0
 x_change = 0
@@ -37,6 +38,7 @@ jump_last = 0
 # Create screen
 screen = pygame.display.set_mode([WIDTH, HEIGHT])
 pygame.display.set_caption('Cloud Hopper')
+
 
 # Check for collision with clouds
 def check_collisions(rect_list, j):
@@ -88,3 +90,74 @@ while running == True:
     screen.blit(score_text, (280, 0))
     high_score_text = font.render('Score: ' + str(score), True, black, background)
     screen.blit(high_score_text, (320, 20))
+    
+    for i in range(len(platforms)):
+        block = pygame.draw.rect(screen, black, platforms[i], 0, 3)
+        blocks.append(block)
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE and game_over:
+                    game_over = False
+                    score = 0
+                    player_x = 170
+                    player_y = 400
+                    background = white
+                    score_last = 0
+                    super_jumps = 2
+                    jump_last = 0
+                    platforms = [[175, 480, 70, 10], [85, 370, 70, 10], [265, 370, 70, 10], [175, 260, 70, 10],
+                                 [85, 150, 70, 10]
+                                 [265, 150, 70, 10], [175, 40, 70, 10]]
+                if event.key == pygame.K_SPACE and not game_over and super_jumps > 0:
+                    super_jumps -= 1
+                    y_change = -15
+                if event.key == pygame.K_a:
+                    x_change= -player_speed
+                if event.key == pygame.K_d:
+                    x_change = player_speed
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_a:
+                    x_change = 0
+                if event.key == pygame.K_d:
+                    x_change = 0
+
+    jump = check_collisions(blocks, jump)
+    player_x += x_change
+    
+    if player_y < 440:
+        player_y = update_player(player_y)
+    else:
+        game_over = True
+        y_change = 0
+        x_change = 0
+        
+        
+    platforms = update_platforms(platforms, player_y, y_change)
+
+    if player_x < -20:
+        player_x = -20
+    elif player_x > 330:
+        player_x = 330
+
+    if x_change > 0:
+        player = pygame.transform.scale(pygame.image.load('zues.png'), (90, 70))
+    elif x_change < 0:
+        player = pygame.transform.flip(pygame.transform.scale(pygame.image.load('zues.png'), (90, 70)), 1, 0)
+
+    if score > high_score:
+        high_score = score
+        
+    if score - score_last > 15:
+        score_last = score
+        background = (random.randint(1, 255), random.randint(1, 255), random.randint(1, 255))
+
+    if score - jump_last > 50:
+        jump_last = score
+        super_jumps += 1
+        
+    pygame.display.flip()
+pygame.quit()
+
